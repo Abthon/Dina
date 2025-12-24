@@ -7,6 +7,20 @@
  * Run with: node server.js
  */
 
+//const { createServer } = require('http');
+//require('dotenv').config();
+//const { parse } = require('url');
+//const next = require('next');
+//const WebSocket = require('ws');
+
+//const dev = process.env.NODE_ENV !== 'production';
+//const hostname = 'localhost';
+//const port = parseInt(process.env.PORT || '3000', 10);
+
+//const app = next({ dev, hostname, port });
+//const handle = app.getRequestHandler();
+
+//changed for railway deployment
 const { createServer } = require('http');
 require('dotenv').config();
 const { parse } = require('url');
@@ -14,11 +28,12 @@ const next = require('next');
 const WebSocket = require('ws');
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
-const port = parseInt(process.env.PORT || '3000', 10);
+const port = process.env.PORT; // 🚨 Railway controls this
 
-const app = next({ dev, hostname, port });
+const app = next({ dev }); // 🚨 DO NOT pass hostname/port
 const handle = app.getRequestHandler();
+
+// end of railway the railway code 
 
 const ADDIS_REALTIME_API_KEY = process.env.ADDIS_REALTIME_API_KEY;
 const ADDIS_REALTIME_WS_URL = `wss://relay.addisassistant.com/ws?kb=emm&apiKey=${ADDIS_REALTIME_API_KEY}`
@@ -358,9 +373,17 @@ app.prepare().then(() => {
     process.exit(1);
   });
 
-  server.listen(port, () => {
-    console.log(`✅ Server ready on http://${hostname}:${port}`);
-    console.log(`📞 Twilio Voice Webhook: http://${hostname}:${port}/api/twilio/voice`);
-    console.log(`📡 Twilio WebSocket: ws://${hostname}:${port}/api/twilio/ws`);
+  // Commented out original code for railway deployment  
+  //server.listen(port, () => {
+  //  console.log(`✅ Server ready on http://${hostname}:${port}`);
+  //  console.log(`📞 Twilio Voice Webhook: http://${hostname}:${port}/api/twilio/voice`);
+  //  console.log(`📡 Twilio WebSocket: ws://${hostname}:${port}/api/twilio/ws`);
+  //});
+  // End of the original code 
+
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`✅ Server ready on port ${port}`);
+    console.log(`📞 Twilio Voice Webhook: https://wss-dina.up.railway.app/api/twilio/voice`);
+    console.log(`📡 Twilio WebSocket: wss://wss-dina.up.railway.app/api/twilio/ws`);
   });
 });
